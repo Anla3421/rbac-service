@@ -1,0 +1,37 @@
+[
+    {
+        "role": "admin",
+        "name": "管理員",
+        "permissions": [
+            "user:view", "user:create", "user:edit", "user:delete",
+            "game:view", "game:config", "game:operate",
+            "system:view", "stats:export",
+            "stats:view",
+            "log:view", "log:export",
+            "notice:view", "notice:create", "notice:edit", "notice:delete", "notice:publish",
+            "event:view", "event:create", "event:edit", "event:delete", "event:publish"
+        ]
+    },
+    {
+        "role": "operator",
+        "name": "運營",
+        "permissions": [
+            "user:view",
+            "game:view", "game:operate",
+            "notice:view", "notice:create", "notice:edit", "notice:publish",
+            "event:view", "event:create", "event:edit", "event:publish"
+        ]
+    },
+    {
+        "role": "cs",
+        "name": "客服",
+        "permissions": [
+            "user:view", "user:edit",
+            "game:view",
+            "stats:view",
+            "log:view",
+            "notice:view",
+            "event:view"
+        ]
+    }
+] 
