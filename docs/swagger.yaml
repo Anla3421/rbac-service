@@ -1,9 +1,62 @@
 basePath: /v1
+definitions:
+  domain.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      jwt:
+        type: string
+      password:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
   description: RBAC 權限管理服務 API 文檔
   title: RBAC Service API
   version: "1.0"
-paths: {}
+paths:
+  /users/{id}:
+    get:
+      description: 根據用戶ID獲取用戶詳細信息
+      parameters:
+      - description: 用戶ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功獲取用戶信息
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: 無效的用戶ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 用戶未找到
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器內部錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 獲取用戶詳情
+      tags:
+      - Users
 swagger: "2.0"

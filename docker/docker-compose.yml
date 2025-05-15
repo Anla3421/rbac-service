@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  
+  db:
+     image: mysql:8.4
+     ports: 
+       - 3306:3306
+     environment:
+        MYSQL_ROOT_PASSWORD: root
+     volumes:
+      - ./sqls:/docker-entrypoint-initdb.d
+
+  # phpmyadmin:
+  #    image: phpmyadmin/phpmyadmin
+  #    restart: always
+  #    ports:
+  #     - 8080:80
+  #    environment:
+  #     - PMA_ARBITRARY=1
+
+  admin:
+     image: adminer:5.2.1
+     ports:
+       - 8081:8080
+
+  # redis:
+  #    image: redis
+  #    ports:
+  #      - 6379:6379
+  
+  # rcli:
+  #   image: redis:latest
+  #   links:
+  #      - redis
+  #   command: >
+  #      sh -c 'redis-cli -h redis '
+
+  # redis-commander:
+  #    container_name: redis-commander
+  #    hostname: redis-commander
+  #    image: rediscommander/redis-commander
+  #    environment:
+  #      - REDIS_HOSTS=local:redis:6379
+  #    ports:
+  #      - "8081:8081"

@@ -2,12 +2,17 @@ package http
 
 import (
 	"net/http"
+	_ "rbac-service/docs"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // SetupRouter 設定路由
-func SetupRouter(r *gin.Engine) {
+func SetupRouter(r *gin.Engine, userHandler *UserHandler) {
+	// Swagger 路由
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// 設定基本路由群組
 	v1 := r.Group("/v1")
 	{
@@ -21,7 +26,7 @@ func SetupRouter(r *gin.Engine) {
 			// @Produce json
 			// @Success 200 {object} map[string]string
 			// @Router /users [post]
-			userGroup.POST("", createUser)
+			userGroup.POST("", userHandler.Create)
 
 			// @Summary 列出用戶
 			// @Description 獲取用戶列表
@@ -29,7 +34,7 @@ func SetupRouter(r *gin.Engine) {
 			// @Produce json
 			// @Success 200 {object} map[string]string
 			// @Router /users [get]
-			userGroup.GET("", listUsers)
+			userGroup.GET("", userHandler.List)
 
 			// @Summary 獲取用戶
 			// @Description 根據ID獲取用戶詳情
@@ -38,7 +43,7 @@ func SetupRouter(r *gin.Engine) {
 			// @Param id path string true "用戶ID"
 			// @Success 200 {object} map[string]string
 			// @Router /users/{id} [get]
-			userGroup.GET("/:id", getUser)
+			userGroup.GET("/:id", userHandler.Get)
 
 			// @Summary 更新用戶
 			// @Description 更新用戶信息
@@ -48,7 +53,7 @@ func SetupRouter(r *gin.Engine) {
 			// @Param id path string true "用戶ID"
 			// @Success 200 {object} map[string]string
 			// @Router /users/{id} [put]
-			userGroup.PUT("/:id", updateUser)
+			userGroup.PUT("/:id", userHandler.Update)
 
 			// @Summary 刪除用戶
 			// @Description 根據ID刪除用戶
@@ -57,7 +62,7 @@ func SetupRouter(r *gin.Engine) {
 			// @Param id path string true "用戶ID"
 			// @Success 200 {object} map[string]string
 			// @Router /users/{id} [delete]
-			userGroup.DELETE("/:id", deleteUser)
+			userGroup.DELETE("/:id", userHandler.Delete)
 		}
 
 		// 角色管理路由
