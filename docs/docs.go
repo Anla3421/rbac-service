@@ -15,6 +15,31 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/authorize": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/auth/batchRevoke": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/auth/revoke": {
+            "post": {
+                "responses": {}
+            }
+        },
         "/users/{id}": {
             "get": {
                 "description": "根據用戶ID獲取用戶詳細信息",
@@ -80,13 +105,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "jwt": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "updated_at": {
                     "type": "string"
@@ -102,7 +133,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:5001",
 	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "RBAC Service API",

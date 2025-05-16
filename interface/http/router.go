@@ -3,14 +3,19 @@ package http
 import (
 	"net/http"
 	_ "rbac-service/docs"
+	"rbac-service/interface/http/delivery"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// SetupRouter 設定路由
-func SetupRouter(r *gin.Engine, userHandler *UserHandler) {
+// SetupRouter 設置路由
+func SetupRouter(
+	r *gin.Engine,
+	userHandler *delivery.UserHandler,
+	authHandler *delivery.AuthHandler,
+) {
 	// Swagger 路由
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// 設定基本路由群組
@@ -161,6 +166,21 @@ func SetupRouter(r *gin.Engine, userHandler *UserHandler) {
 			// @Success 200 {object} map[string]string
 			// @Router /permissions/{id} [delete]
 			permissionGroup.DELETE("/:id", deletePermission)
+		}
+
+		// 授權管理路由
+		authGroup := v1.Group("/auth")
+		{
+			// 登入
+			authGroup.POST("login", authHandler.Login)
+			// 權限驗證
+			authGroup.POST("authorize", authHandler.Authorize)
+			// 刷新令牌
+			authGroup.POST("refresh", authHandler.Refresh)
+			// 取消授權jwt
+			authGroup.POST("revoke", authHandler.Revoke)
+			// 批量取消授權jwt
+			authGroup.POST("batch-revoke", authHandler.BatchRevoke)
 		}
 	}
 

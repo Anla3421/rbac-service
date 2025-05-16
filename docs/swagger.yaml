@@ -5,23 +5,42 @@ definitions:
       created_at:
         type: string
       id:
-        type: string
+        type: integer
       jwt:
         type: string
       password:
         type: string
+      roles:
+        items:
+          type: string
+        type: array
       updated_at:
         type: string
       username:
         type: string
     type: object
-host: localhost:8080
+host: localhost:5001
 info:
   contact: {}
   description: RBAC 權限管理服務 API 文檔
   title: RBAC Service API
   version: "1.0"
 paths:
+  /auth/authorize:
+    post:
+      responses: {}
+  /auth/batchRevoke:
+    post:
+      responses: {}
+  /auth/login:
+    post:
+      responses: {}
+  /auth/refresh:
+    post:
+      responses: {}
+  /auth/revoke:
+    post:
+      responses: {}
   /users/{id}:
     get:
       description: 根據用戶ID獲取用戶詳細信息

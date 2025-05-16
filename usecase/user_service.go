@@ -33,3 +33,20 @@ func (s *UserService) GetUser(ctx context.Context, id string) (*domain.User, err
 
 	return user, nil
 }
+
+// GetByUsername 獲取用戶信息
+func (s *UserService) GetByUsername(ctx context.Context, username string) (*domain.User, error) {
+	// 驗證用戶ID
+	username = strings.TrimSpace(username)
+	if username == "" {
+		return nil, domain.ErrInvalidUserID
+	}
+
+	// 調用倉儲層獲取用戶
+	user, err := s.repo.GetByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

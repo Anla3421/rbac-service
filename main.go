@@ -4,6 +4,7 @@ import (
 	"log"
 	_ "rbac-service/docs"
 	"rbac-service/interface/http"
+	"rbac-service/interface/http/delivery"
 
 	"rbac-service/infrastructure/database"
 	"rbac-service/infrastructure/repository"
@@ -11,13 +12,40 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
+
+type ServiceConfig struct {
+	////// 後續要改成map的形式以便支援多個db
+	Database *gorm.DB
+}
+
+type ServiceContainer struct {
+	userService *usecase.UserService
+	authService *usecase.AuthService
+	userHandler *delivery.UserHandler
+	authHandler *delivery.AuthHandler
+}
+
+func NewServiceContainer(config ServiceConfig) *ServiceContainer {
+	rbacRepo := repository.NewMySQLUserRepository(config.Database)
+
+	userService := usecase.NewUserService(rbacRepo)
+	authService := usecase.NewAuthService(rbacRepo)
+
+	return &ServiceContainer{
+		userService: userService,
+		authService: authService,
+		userHandler: delivery.NewUserHandler(userService),
+		authHandler: delivery.NewAuthHandler(authService),
+	}
+}
 
 func main() {
 	// @title           RBAC Service API
 	// @version         1.0
 	// @description     RBAC 權限管理服務 API 文檔
-	// @host            localhost:8080
+	// @host            localhost:5001
 	// @BasePath        /v1
 
 	// 初始化資料庫
@@ -29,20 +57,22 @@ func main() {
 	}
 
 	// 獲取主資料庫連接
-	primaryDB, err := dbManager.GetDatabase("rbac")
+	rbacDB, err := dbManager.GetDatabase("rbac")
 	if err != nil {
 		log.Fatalf("Failed to get database connection: %v", err)
 	}
 
-	// 創建依賴鏈
-	userRepo := repository.NewMySQLUserRepository(primaryDB)
-	userService := usecase.NewUserService(userRepo)
-	userHandler := http.NewUserHandler(userService)
+	serviceContainer := NewServiceContainer(ServiceConfig{
+		Database: rbacDB,
+	})
 
 	// 設置路由
 	r := gin.Default()
 	r.Use(cors.Default())
-	http.SetupRouter(r, userHandler)
+	http.SetupRouter(r,
+		serviceContainer.userHandler,
+		serviceContainer.authHandler,
+	)
 
 	// 啟動伺服器
 	///// "localhost:5001" 測試用，避免每次都要按防火牆擋案允許，應用":5001"
