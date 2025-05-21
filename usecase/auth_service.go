@@ -81,14 +81,30 @@ func (s *AuthService) Login(username, password string) (string, error) {
 		return "", errors.New("token generation failed")
 	}
 
-	needToupdate := &domain.User{
-		Jwt: tokenString,
-	}
-	// 使用 username 去更新剛剛建立的 jwt token
-	err = s.authRepo.UpdateUser(context.Background(), username, needToupdate)
-	if err != nil {
-		return "", errors.New("invalid credentials")
-	}
+	///// 使用 username 去更新剛剛建立的 jwt token，更新jwt部分尚有問題
+	// needToupdate := &domain.User{
+	// 	Jwt: tokenString,
+	// }
+	// err = s.authRepo.UpdateUser(context.Background(), username, needToupdate)
+	// if err != nil {
+	// 	return "", errors.New("invalid credentials")
+	// }
 
 	return tokenString, nil
+}
+
+// CheckPermission 檢查用戶是否有權限訪問特定資源
+func (s *AuthService) CheckPermission(ctx context.Context, userID string, resource string, action string) (bool, error) {
+	// 檢查輸入參數
+	if userID == "" || resource == "" || action == "" {
+		return false, errors.New("invalid input parameters")
+	}
+
+	// TODO: 這裡需要實現具體的權限檢查邏輯
+	// 1. 獲取用戶的角色
+	// 2. 獲取角色的權限列表
+	// 3. 檢查是否包含所需的權限
+
+	// 暫時返回 true 作為示例
+	return true, nil
 }

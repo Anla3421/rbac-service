@@ -17,27 +17,213 @@ const docTemplate = `{
     "paths": {
         "/auth/authorize": {
             "post": {
-                "responses": {}
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "驗證用戶是否有權限訪問特定資源",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "驗證權限",
+                "parameters": [
+                    {
+                        "description": "授權請求參數",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/delivery.AuthorizeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "驗證成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "無效的請求參數",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "未授權訪問",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "權限不足",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
             }
         },
         "/auth/batchRevoke": {
             "post": {
-                "responses": {}
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "批量撤銷多個訪問令牌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "批量撤銷訪問令牌",
+                "responses": {
+                    "200": {
+                        "description": "批量撤銷成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "無效的令牌",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
             }
         },
         "/auth/login": {
             "post": {
-                "responses": {}
+                "description": "處理用戶登錄並返回訪問令牌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "用戶登錄",
+                "parameters": [
+                    {
+                        "description": "登錄請求參數",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/delivery.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "登錄成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "無效的輸入或登錄失敗",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
             }
         },
         "/auth/refresh": {
             "post": {
-                "responses": {}
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "使用刷新令牌獲取新的訪問令牌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "刷新訪問令牌",
+                "responses": {
+                    "200": {
+                        "description": "令牌刷新成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "無效的刷新令牌",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
             }
         },
         "/auth/revoke": {
             "post": {
-                "responses": {}
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "撤銷指定的訪問令牌",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "撤銷訪問令牌",
+                "responses": {
+                    "200": {
+                        "description": "令牌撤銷成功",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "無效的令牌",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
             }
         },
         "/users/{id}": {
@@ -98,6 +284,38 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "delivery.AuthorizeRequest": {
+            "type": "object",
+            "required": [
+                "action",
+                "resource"
+            ],
+            "properties": {
+                "action": {
+                    "description": "要執行的操作 (例如: read, write, delete)",
+                    "type": "string"
+                },
+                "resource": {
+                    "description": "要訪問的資源",
+                    "type": "string"
+                }
+            }
+        },
+        "delivery.LoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.User": {
             "type": "object",
             "properties": {

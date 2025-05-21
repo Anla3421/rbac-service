@@ -1,5 +1,27 @@
 basePath: /v1
 definitions:
+  delivery.AuthorizeRequest:
+    properties:
+      action:
+        description: '要執行的操作 (例如: read, write, delete)'
+        type: string
+      resource:
+        description: 要訪問的資源
+        type: string
+    required:
+    - action
+    - resource
+    type: object
+  delivery.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   domain.User:
     properties:
       created_at:
@@ -28,19 +50,141 @@ info:
 paths:
   /auth/authorize:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 驗證用戶是否有權限訪問特定資源
+      parameters:
+      - description: 授權請求參數
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.AuthorizeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 驗證成功
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 無效的請求參數
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: 未授權訪問
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: 權限不足
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 驗證權限
+      tags:
+      - Auth
   /auth/batchRevoke:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 批量撤銷多個訪問令牌
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 批量撤銷成功
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: 無效的令牌
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 批量撤銷訪問令牌
+      tags:
+      - Auth
   /auth/login:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 處理用戶登錄並返回訪問令牌
+      parameters:
+      - description: 登錄請求參數
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登錄成功
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 無效的輸入或登錄失敗
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 用戶登錄
+      tags:
+      - Auth
   /auth/refresh:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 使用刷新令牌獲取新的訪問令牌
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 令牌刷新成功
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: 無效的刷新令牌
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 刷新訪問令牌
+      tags:
+      - Auth
   /auth/revoke:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 撤銷指定的訪問令牌
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 令牌撤銷成功
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: 無效的令牌
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 撤銷訪問令牌
+      tags:
+      - Auth
   /users/{id}:
     get:
       description: 根據用戶ID獲取用戶詳細信息
