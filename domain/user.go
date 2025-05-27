@@ -10,5 +10,5 @@ type User struct {
 	Jwt       string    `json:"jwt"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Roles     []string  `json:"roles" gorm:"type:json"`
+	Roles     []string  `json:"roles,omitempty" gorm:"type:json"`
 }

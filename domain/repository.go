@@ -6,7 +6,8 @@ import "context"
 type BaseRepository interface {
 	GetByID(ctx context.Context, id string) (*User, error)
 	GetByUsername(ctx context.Context, username string) (*User, error)
-	UpdateUser(ctx context.Context, username string, user *User) error
+	UpdateUser(ctx context.Context, username string, updateFields map[string]interface{}) error
+	CreateUser(ctx context.Context, user *User) (*User, error)
 }
 
 type UserRepository interface {

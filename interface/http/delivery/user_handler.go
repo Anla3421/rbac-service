@@ -1,11 +1,13 @@
 package delivery
 
 import (
+	"context"
 	"net/http"
 	"rbac-service/domain"
 	"rbac-service/usecase"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserHandler 處理用戶相關的 HTTP 請求
@@ -21,8 +23,74 @@ func NewUserHandler(userService *usecase.UserService) *UserHandler {
 }
 
 // Create 處理創建用戶的請求
+// @Summary 創建新用戶
+// @Description 使用提供的用戶名和密碼創建新用戶
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body LoginRequest true "用戶創建信息"
+// @Success 201 {object} map[string]interface{} "用戶創建成功"
+// @Failure 400 {object} map[string]string "參數驗證失敗"
+// @Failure 409 {object} map[string]string "用戶名已存在"
+// @Failure 500 {object} map[string]string "服務器內部錯誤"
+// @Router /users/create [post]
 func (h *UserHandler) Create(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "ok"})
+	////// 定義用戶創建請求的結構體，要 loging 共用還是分開？
+	// type CreateUserRequest struct {
+	// 	Username string `json:"username" binding:"required" example:"johndoe"`
+	// 	Password string `json:"password" binding:"required,min=5" example:"password123"`
+	// }
+
+	// 解析請求數據
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		// 統一返回400，避免被猜測
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "參數驗證失敗",
+		})
+		return
+	}
+
+	// 檢查用戶名是否已存在
+	existingUser, _ := h.userService.GetByUsername(context.Background(), req.Username)
+	if existingUser != nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": "用戶名已存在",
+		})
+		return
+	}
+
+	// 密碼加密
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "密碼處理失敗",
+		})
+		return
+	}
+
+	// 創建新用戶
+	newUser := &domain.User{
+		Username: req.Username,
+		Password: string(hashedPassword),
+	}
+
+	// 調用用戶服務創建用戶
+	createdUser, err := h.userService.CreateUser(context.Background(), newUser)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "創建用戶失敗",
+		})
+		return
+	}
+
+	// 返回創建成功的用戶信息
+	c.JSON(http.StatusCreated, gin.H{
+		"user": gin.H{
+			"id":       createdUser.ID,
+			"username": createdUser.Username,
+		},
+	})
 }
 
 // List 處理列出用戶的請求

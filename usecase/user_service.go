@@ -50,3 +50,13 @@ func (s *UserService) GetByUsername(ctx context.Context, username string) (*doma
 
 	return user, nil
 }
+
+// CreateUser 創建用戶
+func (s *UserService) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
+	// 調用倉儲層創建用戶
+	createdUser, err := s.repo.CreateUser(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return createdUser, nil
+}

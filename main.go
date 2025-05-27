@@ -45,7 +45,7 @@ func main() {
 	// @title           RBAC Service API
 	// @version         1.0
 	// @description     RBAC 權限管理服務 API 文檔
-	// @host            localhost:5001
+	// @host            localhost:5002
 	// @BasePath        /v1
 
 	// 初始化資料庫
@@ -75,8 +75,8 @@ func main() {
 	)
 
 	// 啟動伺服器
-	///// "localhost:5001" 測試用，避免每次都要按防火牆擋案允許，應用":5001"
-	if err := r.Run(":5001"); err != nil {
+	///// "localhost:5002" 測試用，避免每次都要按防火牆擋案允許，應用":5002"
+	if err := r.Run("localhost:5002"); err != nil {
 		log.Fatalf("Server startup failed: %v", err)
 	}
 }

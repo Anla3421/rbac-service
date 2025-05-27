@@ -24,14 +24,7 @@ func SetupRouter(
 		// 用戶管理路由
 		userGroup := v1.Group("/users")
 		{
-			// @Summary 創建用戶
-			// @Description 創建新的用戶
-			// @Tags Users
-			// @Accept json
-			// @Produce json
-			// @Success 200 {object} map[string]string
-			// @Router /users [post]
-			userGroup.POST("", userHandler.Create)
+			userGroup.POST("/create", userHandler.Create)
 
 			// @Summary 列出用戶
 			// @Description 獲取用戶列表
@@ -41,13 +34,6 @@ func SetupRouter(
 			// @Router /users [get]
 			userGroup.GET("", userHandler.List)
 
-			// @Summary 獲取用戶
-			// @Description 根據ID獲取用戶詳情
-			// @Tags Users
-			// @Produce json
-			// @Param id path string true "用戶ID"
-			// @Success 200 {object} map[string]string
-			// @Router /users/{id} [get]
 			userGroup.GET("/:id", userHandler.Get)
 
 			// @Summary 更新用戶

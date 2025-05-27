@@ -59,6 +59,8 @@ func (s *AuthService) Login(username, password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	////// 測試用 print log，屆時要移除
 	fmt.Println("輸入密碼加密結果:", string(hashedPassword))
 	fmt.Println("資料庫密碼:", user.Password)
 
@@ -81,14 +83,14 @@ func (s *AuthService) Login(username, password string) (string, error) {
 		return "", errors.New("token generation failed")
 	}
 
-	///// 使用 username 去更新剛剛建立的 jwt token，更新jwt部分尚有問題
-	// needToupdate := &domain.User{
-	// 	Jwt: tokenString,
-	// }
-	// err = s.authRepo.UpdateUser(context.Background(), username, needToupdate)
-	// if err != nil {
-	// 	return "", errors.New("invalid credentials")
-	// }
+	// 使用 username 去更新剛剛建立的 jwt token
+	needToupdate := map[string]interface{}{
+		"Jwt": tokenString,
+	}
+	err = s.authRepo.UpdateUser(context.Background(), username, needToupdate)
+	if err != nil {
+		return "", errors.New("invalid credentials")
+	}
 
 	return tokenString, nil
 }

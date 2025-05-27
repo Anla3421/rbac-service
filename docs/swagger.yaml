@@ -41,7 +41,7 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:5001
+host: localhost:5002
 info:
   contact: {}
   description: RBAC 權限管理服務 API 文檔
@@ -220,6 +220,47 @@ paths:
               type: string
             type: object
       summary: 獲取用戶詳情
+      tags:
+      - Users
+  /users/create:
+    post:
+      consumes:
+      - application/json
+      description: 使用提供的用戶名和密碼創建新用戶
+      parameters:
+      - description: 用戶創建信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 用戶創建成功
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 參數驗證失敗
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 用戶名已存在
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器內部錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 創建新用戶
       tags:
       - Users
 swagger: "2.0"
