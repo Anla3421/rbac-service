@@ -1,5 +1,19 @@
 services:
-  
+  game-server-demo:
+    image: anla3421/game-server-demo:latest
+    # image: game-server-demo:latest
+    ports:
+      - 5001:5001
+      - 5000:5000
+    networks:
+      - rbac-network
+  rbac-service:
+    image: anla3421/rbac-service:latest
+    # image: rbac-service:latest
+    ports:
+      - 5002:5002
+    networks:
+      - rbac-network
   db:
      image: mysql:8.4
      ports: 
@@ -8,37 +22,15 @@ services:
         MYSQL_ROOT_PASSWORD: root
      volumes:
       - ./sqls:/docker-entrypoint-initdb.d
-
-  # phpmyadmin:
-  #    image: phpmyadmin/phpmyadmin
-  #    restart: always
-  #    ports:
-  #     - 8080:80
-  #    environment:
-  #     - PMA_ARBITRARY=1
-
+     networks:
+      - rbac-network
   admin:
      image: adminer:5.2.1
      ports:
        - 8081:8080
+     networks:
+      - rbac-network
 
-  # redis:
-  #    image: redis
-  #    ports:
-  #      - 6379:6379
-  
-  # rcli:
-  #   image: redis:latest
-  #   links:
-  #      - redis
-  #   command: >
-  #      sh -c 'redis-cli -h redis '
-
-  # redis-commander:
-  #    container_name: redis-commander
-  #    hostname: redis-commander
-  #    image: rediscommander/redis-commander
-  #    environment:
-  #      - REDIS_HOSTS=local:redis:6379
-  #    ports:
-  #      - "8081:8081"
+networks:
+  rbac-network:
+    driver: bridge

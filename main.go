@@ -76,7 +76,7 @@ func main() {
 
 	// 啟動伺服器
 	///// "localhost:5002" 測試用，避免每次都要按防火牆擋案允許，應用":5002"
-	if err := r.Run("localhost:5002"); err != nil {
+	if err := r.Run(":5002"); err != nil {
 		log.Fatalf("Server startup failed: %v", err)
 	}
 }
