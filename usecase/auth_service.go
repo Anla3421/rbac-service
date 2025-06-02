@@ -5,12 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 
 	"rbac-service/domain"
+	"rbac-service/infrastructure/utils"
 )
 
 // AuthService 授權服務實作
@@ -71,14 +70,7 @@ func (s *AuthService) Login(username, password string) (string, error) {
 	}
 
 	// 產生 JWT token
-	jwtKey := []byte("jwt_for_rcba_login")
-	claims := jwt.MapClaims{
-		"username": username,
-		"role":     user.Roles,
-		"exp":      jwt.NewNumericDate(time.Now().Add(time.Hour * 2)),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := utils.GenerateJWTToken(username, user.Roles)
 	if err != nil {
 		return "", errors.New("token generation failed")
 	}
@@ -95,18 +87,37 @@ func (s *AuthService) Login(username, password string) (string, error) {
 	return tokenString, nil
 }
 
+// Logout 處理使用者登出邏輯
+func (s *AuthService) Logout(ctx context.Context, jwt string) error {
+	return s.authRepo.DeleteUserJwt(ctx, jwt)
+}
+
 // CheckPermission 檢查用戶是否有權限訪問特定資源
-func (s *AuthService) CheckPermission(ctx context.Context, userID string, resource string, action string) (bool, error) {
-	// 檢查輸入參數
-	if userID == "" || resource == "" || action == "" {
+func (s *AuthService) CheckPermission(ctx context.Context, userID string, token string, resource string, action string) (bool, error) {
+	// 1. 檢查輸入參數
+	if userID == "" || token == "" || resource == "" || action == "" {
 		return false, errors.New("invalid input parameters")
 	}
 
-	// TODO: 這裡需要實現具體的權限檢查邏輯
-	// 1. 獲取用戶的角色
-	// 2. 獲取角色的權限列表
-	// 3. 檢查是否包含所需的權限
+	// 2. 先解析 token
+	claims, err := utils.ParseJWTToken(token)
+	if err != nil {
+		return false, errors.New("invalid token")
+	}
+	fmt.Println("解析後的 token:", claims)
 
-	// 暫時返回 true 作為示例
+	// 3. 從資料庫取出用戶當前的 JWT
+	user, err := s.authRepo.GetByUsername(ctx, userID)
+	if err != nil {
+		return false, errors.New("user not found")
+	}
+
+	// 4. 比對 token
+	if user.Jwt != token {
+		return false, errors.New("token has been invalidated")
+	}
+
+	// 5. 進行權限檢查的邏輯
+	// TODO: 實現具體的權限檢查
 	return true, nil
 }

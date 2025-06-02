@@ -68,6 +68,25 @@ func (r *MySQLUserRepository) UpdateUser(ctx context.Context, username string, u
 	return nil
 }
 
+// UpdateUser 根據 username 更新用戶信息，可 partial update
+func (r *MySQLUserRepository) DeleteUserJwt(ctx context.Context, jwt string) error {
+	// 執行更新
+	result := r.db.WithContext(ctx).
+		Model(&domain.User{}).
+		Where("jwt = ?", jwt).
+		Update("jwt", "")
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// 檢查是否有實際更新
+	if result.RowsAffected == 0 {
+		return domain.ErrUserNotFound
+	}
+	return nil
+}
+
 // CreateUser 創建用戶
 func (r *MySQLUserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	// 只創建指定的欄位，排除 Roles

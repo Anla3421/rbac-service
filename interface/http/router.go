@@ -159,6 +159,8 @@ func SetupRouter(
 		{
 			// 登入
 			authGroup.POST("login", authHandler.Login)
+			// 登出
+			authGroup.POST("logout", authHandler.Logout)
 			// 權限驗證
 			authGroup.POST("authorize", authHandler.Authorize)
 			// 刷新令牌

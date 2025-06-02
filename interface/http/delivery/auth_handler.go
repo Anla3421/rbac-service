@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"rbac-service/domain"
 	"rbac-service/usecase"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -60,6 +61,29 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
+// Logout 處理用戶登出請求
+// @Summary 用戶登出
+// @Description 處理用戶登出
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} map[string]interface{} "登出成功"
+// @Failure 400 {object} map[string]interface{} "無效的輸入或登出失敗"
+// @Router /auth/logout [post]
+func (h *AuthHandler) Logout(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	token = strings.TrimPrefix(token, "Bearer ")
+
+	err := h.authService.Logout(c, token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "logout failed"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "logout successful"})
+}
+
 // Authorize 處理權限驗證的請求
 // @Summary 驗證權限
 // @Description 驗證用戶是否有權限訪問特定資源
@@ -86,7 +110,14 @@ func (h *AuthHandler) Authorize(c *gin.Context) {
 		return
 	}
 
-	hasPermission, err := h.authService.CheckPermission(c, userID.(string), req.Resource, req.Action)
+	////// 待確認，是否要這樣用
+	token, exists := c.Get("token")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, domain.NewErrorResponse("Unauthorized", "Please login first"))
+		return
+	}
+
+	hasPermission, err := h.authService.CheckPermission(c, userID.(string), token.(string), req.Resource, req.Action)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, domain.NewErrorResponse("Permission Check Failed", err.Error()))
 		return

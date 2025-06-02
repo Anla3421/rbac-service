@@ -139,6 +139,33 @@ paths:
       summary: 用戶登錄
       tags:
       - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: 處理用戶登出
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登出成功
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 無效的輸入或登出失敗
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 用戶登出
+      tags:
+      - Auth
   /auth/refresh:
     post:
       consumes:

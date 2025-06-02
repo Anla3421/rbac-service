@@ -6,9 +6,9 @@
 ## 2. API端點
 
 ### 2.1 用戶管理
-- `POST /v1/users` - 創建用戶
+- [x] `POST /v1/users` - 創建用戶
 - `GET /v1/users` - 查詢用戶列表
-- `GET /v1/users/{id}` - 獲取指定用戶
+- [x] `GET /v1/users/{id}` - 獲取指定用戶
 - `PUT /v1/users/{id}` - 更新用戶信息
 - `DELETE /v1/users/{id}` - 刪除用戶
 
@@ -34,8 +34,9 @@
 - `DELETE /v1/roles/{id}/permissions/{permId}` - 移除角色的權限
 
 ### 2.5 認證和授權
-- `POST /v1/auth/login` - 登入 -> 已實作，更新jwt部分尚有問題須修正
-- `POST /v1/auth/authorize` - 權限驗證 -> 實作中
+- [x] `POST /v1/auth/login` - 登入
+- [x] `POST /v1/auth/login` - 登出 
+- `POST /v1/auth/authorize` - 權限驗證 -> pending
 - `POST /v1/auth/refresh` - 刷新令牌
 - `POST /v1/auth/revoke` - 取消授權jwt
 - `POST /v1/auth/batch-revoke` - 批量取消授權jwt
