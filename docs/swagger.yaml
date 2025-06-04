@@ -54,6 +54,11 @@ paths:
       - application/json
       description: 驗證用戶是否有權限訪問特定資源
       parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 授權請求參數
         in: body
         name: request
@@ -93,6 +98,12 @@ paths:
       consumes:
       - application/json
       description: 批量撤銷多個訪問令牌
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -171,6 +182,12 @@ paths:
       consumes:
       - application/json
       description: 使用刷新令牌獲取新的訪問令牌
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -194,6 +211,12 @@ paths:
       consumes:
       - application/json
       description: 撤銷指定的訪問令牌
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -216,6 +239,11 @@ paths:
     get:
       description: 根據用戶ID獲取用戶詳細信息
       parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 用戶ID
         in: path
         name: id

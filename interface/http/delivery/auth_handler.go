@@ -90,6 +90,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer Token"
 // @Param request body AuthorizeRequest true "授權請求參數"
 // @Security BearerAuth
 // @Success 200 {object} map[string]interface{} "驗證成功"
@@ -142,6 +143,7 @@ func (h *AuthHandler) Authorize(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer Token"
 // @Security BearerAuth
 // @Success 200 {object} map[string]interface{} "令牌刷新成功"
 // @Failure 401 {object} map[string]interface{} "無效的刷新令牌"
@@ -156,6 +158,7 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer Token"
 // @Security BearerAuth
 // @Success 200 {object} map[string]interface{} "令牌撤銷成功"
 // @Failure 401 {object} map[string]interface{} "無效的令牌"
@@ -170,6 +173,7 @@ func (h *AuthHandler) Revoke(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer Token"
 // @Security BearerAuth
 // @Success 200 {object} map[string]interface{} "批量撤銷成功"
 // @Failure 401 {object} map[string]interface{} "無效的令牌"
@@ -183,6 +187,7 @@ func (h *AuthHandler) BatchRevoke(c *gin.Context) {
 // @Description 根據用戶ID獲取用戶詳細信息
 // @Tags Users
 // @Produce json
+// @Param Authorization header string true "Bearer Token"
 // @Param id path string true "用戶ID"
 // @Success 200 {object} domain.User "成功獲取用戶信息"
 // @Failure 400 {object} map[string]string "無效的用戶ID"

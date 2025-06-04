@@ -35,6 +35,13 @@ const docTemplate = `{
                 "summary": "驗證權限",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "授權請求參數",
                         "name": "request",
                         "in": "body",
@@ -94,6 +101,15 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "批量撤銷訪問令牌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "批量撤銷成功",
@@ -212,6 +228,15 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "刷新訪問令牌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "令牌刷新成功",
@@ -248,6 +273,15 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "撤銷訪問令牌",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "令牌撤銷成功",
@@ -339,6 +373,13 @@ const docTemplate = `{
                 ],
                 "summary": "獲取用戶詳情",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "用戶ID",

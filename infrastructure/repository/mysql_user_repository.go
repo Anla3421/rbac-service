@@ -93,3 +93,10 @@ func (r *MySQLUserRepository) CreateUser(ctx context.Context, user *domain.User)
 	result := r.db.WithContext(ctx).Omit("Roles").Create(user)
 	return user, result.Error
 }
+
+// CreateUser 創建用戶
+func (r *MySQLUserRepository) CreateUser2(ctx context.Context, user *domain.User) (*domain.User, error) {
+	// 只創建指定的欄位，排除 Roles
+	result := r.db.WithContext(ctx).Omit("Roles").Create(user)
+	return user, result.Error
+}

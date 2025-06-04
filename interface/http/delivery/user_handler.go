@@ -103,6 +103,7 @@ func (h *UserHandler) List(c *gin.Context) {
 // @Description 根據用戶ID獲取用戶詳細信息
 // @Tags Users
 // @Produce json
+// @Param Authorization header string true "Bearer Token"
 // @Param id path string true "用戶ID"
 // @Success 200 {object} domain.User "成功獲取用戶信息"
 // @Failure 400 {object} map[string]string "無效的用戶ID"

@@ -1,11 +1,19 @@
 package utils
 
 import (
+	"context"
 	"errors"
+	"rbac-service/domain"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var userRepo domain.UserRepository
+
+func NewUserRepo(repo domain.UserRepository) {
+	userRepo = repo
+}
 
 // JWT 密鑰
 var jwtKey = []byte("jwt_for_rcba_login")
@@ -18,6 +26,7 @@ func GenerateJWTToken(username string, roles []string) (string, error) {
 		"exp":      jwt.NewNumericDate(time.Now().Add(time.Hour * 2)),
 	}
 
+	// jwt 加密方式
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
@@ -28,21 +37,17 @@ func GenerateJWTToken(username string, roles []string) (string, error) {
 }
 
 // CompareJWTToken 比對 jwt 是否相同
-func CompareJWTToken(tokenNeedToCheck string, tokenInDB string) (bool, error) {
-	// 檢查輸入參數
-	if tokenNeedToCheck == "" || tokenInDB == "" {
-		return false, errors.New("invalid input parameters")
+func CompareJWTToken(
+	ctx context.Context,
+	username string,
+	tokenNeedToCheck string,
+) (bool, error) {
+	user, err := userRepo.GetByUsername(ctx, username)
+	if err != nil {
+		return false, errors.New("user not found")
 	}
 
-	isExpired := IsTokenExpired(tokenNeedToCheck)
-	if isExpired {
-		return false, errors.New("invalid token")
-	}
-
-	if tokenNeedToCheck != tokenInDB {
-		return false, errors.New("token has been invalidated")
-	}
-	return true, nil
+	return tokenNeedToCheck == user.Jwt, nil
 }
 
 // ParseJWTToken 解析 JWT token

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	_ "rbac-service/docs"
 	"rbac-service/interface/http/delivery"
+	"rbac-service/interface/http/middleware"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -18,14 +19,16 @@ func SetupRouter(
 ) {
 	// Swagger 路由
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// 不走中介層的 api
+	r.POST("/v1/user/registry", userHandler.Create)
+	r.POST("/v1/auth/login", authHandler.Login)
 	// 設定基本路由群組
 	v1 := r.Group("/v1")
+	v1.Use(middleware.JWTMiddleware())
 	{
 		// 用戶管理路由
 		userGroup := v1.Group("/users")
 		{
-			userGroup.POST("/create", userHandler.Create)
-
 			// @Summary 列出用戶
 			// @Description 獲取用戶列表
 			// @Tags Users
@@ -157,8 +160,6 @@ func SetupRouter(
 		// 授權管理路由
 		authGroup := v1.Group("/auth")
 		{
-			// 登入
-			authGroup.POST("login", authHandler.Login)
 			// 登出
 			authGroup.POST("logout", authHandler.Logout)
 			// 權限驗證

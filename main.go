@@ -8,6 +8,7 @@ import (
 
 	"rbac-service/infrastructure/database"
 	"rbac-service/infrastructure/repository"
+	"rbac-service/infrastructure/utils"
 	"rbac-service/usecase"
 
 	"github.com/gin-contrib/cors"
@@ -29,7 +30,9 @@ type ServiceContainer struct {
 
 func NewServiceContainer(config ServiceConfig) *ServiceContainer {
 	rbacRepo := repository.NewMySQLUserRepository(config.Database)
-
+	// utils
+	utils.NewUserRepo(rbacRepo)
+	// Service
 	userService := usecase.NewUserService(rbacRepo)
 	authService := usecase.NewAuthService(rbacRepo)
 
@@ -51,7 +54,7 @@ func main() {
 	// 初始化資料庫
 	dbManager := database.NewDatabaseManager()
 
-	// 載入資料庫配置 - 這是關鍵步驟
+	// 載入資料庫配置
 	if err := dbManager.LoadConfigs(); err != nil {
 		log.Fatalf("Failed to load database configuration: %v", err)
 	}
