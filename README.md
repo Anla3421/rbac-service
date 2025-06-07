@@ -8,8 +8,8 @@
 
 ### 2.1 用戶管理
 - [x] `POST /v1/users` - 創建用戶
-- `GET /v1/users` - 查詢用戶列表
 - [x] `GET /v1/users/{id}` - 獲取指定用戶
+- [ ] - `GET /v1/users` - 查詢用戶列表
 - `PUT /v1/users/{id}` - 更新用戶信息
 - `DELETE /v1/users/{id}` - 刪除用戶
 
