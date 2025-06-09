@@ -10,6 +10,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// 定義更新請求的結構體，根據目前定義的 schema 只有密碼能修改，若後續 schema 有變更再一起修改
+type UpdateUserRequest struct {
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
 // UserHandler 處理用戶相關的 HTTP 請求
 type UserHandler struct {
 	userService *usecase.UserService
@@ -33,7 +39,7 @@ func NewUserHandler(userService *usecase.UserService) *UserHandler {
 // @Failure 400 {object} map[string]string "參數驗證失敗"
 // @Failure 409 {object} map[string]string "用戶名已存在"
 // @Failure 500 {object} map[string]string "服務器內部錯誤"
-// @Router /users/create [post]
+// @Router /users/registry [post]
 func (h *UserHandler) Create(c *gin.Context) {
 	////// 定義用戶創建請求的結構體，要 loging 共用還是分開？
 	// type CreateUserRequest struct {
@@ -140,11 +146,118 @@ func (h *UserHandler) Get(c *gin.Context) {
 }
 
 // Update 處理更新用戶的請求
+// @Summary 更新用戶信息
+// @Description 根據用戶名更新用戶密碼或其他信息，根據目前定義的 schema 只有密碼能修改，若後續 schema 有變更再一起修改
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Param id path string true "用戶ID"
+// @Param user body UpdateUserRequest true "用戶更新信息"
+// @Success 200 {object} map[string]interface{} "成功更新用戶信息"
+// @Failure 400 {object} map[string]string "參數驗證失敗或無效的用戶ID"
+// @Failure 404 {object} map[string]string "用戶未找到"
+// @Failure 500 {object} map[string]string "服務器內部錯誤"
+// @Router /users [put]
 func (h *UserHandler) Update(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "ok"})
+
+	// 解析請求數據
+	var req UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "參數驗證失敗",
+		})
+		return
+	}
+
+	// 準備更新的用戶資訊
+	updateUser := &domain.User{
+		Username: req.Username,
+		Password: req.Password,
+	}
+
+	// 如果提供了新的密碼，則加密
+	if req.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "密碼處理失敗",
+			})
+			return
+		}
+		updateUser.Password = string(hashedPassword)
+	}
+
+	// 調用用戶服務更新用戶
+	updatedUser, err := h.userService.UpdateUser(c, updateUser)
+	if err != nil {
+		switch err {
+		case domain.ErrUserNotFound:
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "用戶未找到",
+			})
+			return
+		case domain.ErrInvalidUserID:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "無效的用戶ID",
+			})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "伺服器錯誤",
+			})
+			return
+		}
+	}
+
+	// 返回更新成功的用戶信息
+	c.JSON(http.StatusOK, gin.H{
+		"user": gin.H{
+			"id":       updatedUser.ID,
+			"username": updatedUser.Username,
+		},
+	})
 }
 
 // Delete 處理刪除用戶的請求
+// @Summary 刪除用戶
+// @Description 根據用戶名直接刪除用戶
+// @Tags Users
+// @Produce json
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} map[string]string "用戶成功刪除"
+// @Failure 404 {object} map[string]string "用戶未找到"
+// @Failure 500 {object} map[string]string "服務器內部錯誤"
+// @Router /users/ [delete]
 func (h *UserHandler) Delete(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "ok"})
+	// 準備更新的用戶資訊
+	updateUser := &domain.User{
+		Username: c.GetString("username"),
+		Jwt:      c.GetString("token"),
+	}
+	err := h.userService.DeleteUser(c, updateUser)
+	if err != nil {
+		switch err {
+		case domain.ErrUserNotFound:
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": domain.ErrUserNotFound.Error(),
+			})
+			return
+		case domain.ErrInvalidJwt:
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": domain.ErrInvalidJwt.Error(),
+			})
+			return
+
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": domain.ErrInternalServerError.Error(),
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "用戶刪除成功",
+	})
 }

@@ -68,7 +68,7 @@ func (r *MySQLUserRepository) UpdateUser(ctx context.Context, username string, u
 	return nil
 }
 
-// UpdateUser 根據 username 更新用戶信息，可 partial update
+// DeleteUserJwt 刪除使用者的 Jwt token
 func (r *MySQLUserRepository) DeleteUserJwt(ctx context.Context, jwt string) error {
 	// 執行更新
 	result := r.db.WithContext(ctx).
@@ -87,15 +87,26 @@ func (r *MySQLUserRepository) DeleteUserJwt(ctx context.Context, jwt string) err
 	return nil
 }
 
-// CreateUser 創建用戶
-func (r *MySQLUserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
-	// 只創建指定的欄位，排除 Roles
-	result := r.db.WithContext(ctx).Omit("Roles").Create(user)
-	return user, result.Error
+// DeleteUser by username
+func (r *MySQLUserRepository) DeleteUser(ctx context.Context, username string) error {
+	result := r.db.WithContext(ctx).
+		Where("username = ?", username).
+		Delete(&domain.User{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// 檢查是否有實際刪除
+	if result.RowsAffected == 0 {
+		return domain.ErrUserNotFound
+	}
+
+	return nil
 }
 
 // CreateUser 創建用戶
-func (r *MySQLUserRepository) CreateUser2(ctx context.Context, user *domain.User) (*domain.User, error) {
+func (r *MySQLUserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	// 只創建指定的欄位，排除 Roles
 	result := r.db.WithContext(ctx).Omit("Roles").Create(user)
 	return user, result.Error

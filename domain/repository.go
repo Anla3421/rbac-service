@@ -9,6 +9,7 @@ type BaseRepository interface {
 	UpdateUser(ctx context.Context, username string, updateFields map[string]interface{}) error
 	DeleteUserJwt(ctx context.Context, jwt string) error
 	CreateUser(ctx context.Context, user *User) (*User, error)
+	DeleteUser(ctx context.Context, username string) error
 }
 
 type UserRepository interface {

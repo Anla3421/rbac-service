@@ -22,6 +22,13 @@ definitions:
     - password
     - username
     type: object
+  delivery.UpdateUserRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   domain.User:
     properties:
       created_at:
@@ -235,6 +242,90 @@ paths:
       summary: 撤銷訪問令牌
       tags:
       - Auth
+  /users:
+    put:
+      consumes:
+      - application/json
+      description: 根據用戶名更新用戶密碼或其他信息，根據目前定義的 schema 只有密碼能修改，若後續 schema 有變更再一起修改
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 用戶ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 用戶更新信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/delivery.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功更新用戶信息
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 參數驗證失敗或無效的用戶ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 用戶未找到
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器內部錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 更新用戶信息
+      tags:
+      - Users
+  /users/:
+    delete:
+      description: 根據用戶名直接刪除用戶
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 用戶成功刪除
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 用戶未找到
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 服務器內部錯誤
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 刪除用戶
+      tags:
+      - Users
   /users/{id}:
     get:
       description: 根據用戶ID獲取用戶詳細信息
@@ -277,7 +368,7 @@ paths:
       summary: 獲取用戶詳情
       tags:
       - Users
-  /users/create:
+  /users/registry:
     post:
       consumes:
       - application/json

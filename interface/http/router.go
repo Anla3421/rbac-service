@@ -20,7 +20,7 @@ func SetupRouter(
 	// Swagger 路由
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// 不走中介層的 api
-	r.POST("/v1/user/registry", userHandler.Create)
+	r.POST("/v1/users/registry", userHandler.Create)
 	r.POST("/v1/auth/login", authHandler.Login)
 	// 設定基本路由群組
 	v1 := r.Group("/v1")
@@ -40,23 +40,10 @@ func SetupRouter(
 			userGroup.GET("/:id", userHandler.Get)
 
 			// @Summary 更新用戶
-			// @Description 更新用戶信息
-			// @Tags Users
-			// @Accept json
-			// @Produce json
-			// @Param id path string true "用戶ID"
-			// @Success 200 {object} map[string]string
-			// @Router /users/{id} [put]
-			userGroup.PUT("/:id", userHandler.Update)
+			userGroup.PUT("/", userHandler.Update)
 
 			// @Summary 刪除用戶
-			// @Description 根據ID刪除用戶
-			// @Tags Users
-			// @Produce json
-			// @Param id path string true "用戶ID"
-			// @Success 200 {object} map[string]string
-			// @Router /users/{id} [delete]
-			userGroup.DELETE("/:id", userHandler.Delete)
+			userGroup.DELETE("/", userHandler.Delete)
 		}
 
 		// 角色管理路由

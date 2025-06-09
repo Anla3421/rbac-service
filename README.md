@@ -10,8 +10,8 @@
 - [x] `POST /v1/users` - 創建用戶
 - [x] `GET /v1/users/{id}` - 獲取指定用戶
 - [ ] - `GET /v1/users` - 查詢用戶列表
-- `PUT /v1/users/{id}` - 更新用戶信息
-- `DELETE /v1/users/{id}` - 刪除用戶
+- [x] `PUT /v1/users` - 更新用戶信息
+- [x] `DELETE /v1/users` - 刪除用戶
 
 ### 2.2 角色管理
 - `POST /v1/roles` - 創建角色

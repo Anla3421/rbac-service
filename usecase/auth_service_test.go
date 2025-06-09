@@ -44,6 +44,11 @@ func (m *MockAuthRepository) CreateUser(ctx context.Context, user *domain.User) 
 	return args.Get(0).(*domain.User), args.Error(1)
 }
 
+func (m *MockAuthRepository) DeleteUser(ctx context.Context, username string) error {
+	args := m.Called(ctx, username)
+	return args.Error(0)
+}
+
 func (m *MockAuthRepository) GetByID(ctx context.Context, id string) (*domain.User, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {

@@ -57,7 +57,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		}
 
 		// 7. 將用戶信息存入 context
-		c.Set("userID", username)
+		c.Set("username", username)
 		c.Set("token", token)
 
 		// 8. 繼續處理請求

@@ -181,38 +181,3 @@ func (h *AuthHandler) Revoke(c *gin.Context) {
 func (h *AuthHandler) BatchRevoke(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }
-
-// Get 處理獲取單個用戶的請求
-// @Summary 獲取用戶詳情
-// @Description 根據用戶ID獲取用戶詳細信息
-// @Tags Users
-// @Produce json
-// @Param Authorization header string true "Bearer Token"
-// @Param id path string true "用戶ID"
-// @Success 200 {object} domain.User "成功獲取用戶信息"
-// @Failure 400 {object} map[string]string "無效的用戶ID"
-// @Failure 404 {object} map[string]string "用戶未找到"
-// @Failure 500 {object} map[string]string "服務器內部錯誤"
-// @Router /users/{id} [get]
-func (h *AuthHandler) Get(c *gin.Context) {
-	id := c.Param("id")
-
-	// 調用服務層獲取用戶
-	user, err := h.authService.GetUser(c, id)
-	if err != nil {
-		switch err {
-		case domain.ErrUserNotFound:
-			c.JSON(http.StatusNotFound, domain.NewErrorResponse("User Not Found", "The requested user does not exist"))
-			return
-		case domain.ErrInvalidUserID:
-			c.JSON(http.StatusBadRequest, domain.NewErrorResponse("Invalid Input", "Invalid user ID format"))
-			return
-		default:
-			c.JSON(http.StatusInternalServerError, domain.NewErrorResponse("Server Error", "Internal server error occurred"))
-			return
-		}
-	}
-
-	// 返回用戶信息
-	c.JSON(http.StatusOK, user)
-}
