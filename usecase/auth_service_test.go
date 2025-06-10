@@ -133,3 +133,41 @@ func TestLogin_WrongPassword(t *testing.T) {
 	assert.Contains(t, err.Error(), "invalid credentials")
 	mockRepo.AssertExpectations(t)
 }
+
+func TestLogout_SuccessfulLogout(t *testing.T) {
+	// 準備測試數據
+	mockRepo := new(MockAuthRepository)
+	authService := NewAuthService(mockRepo)
+
+	jwt := "some-valid-jwt-token"
+
+	// 設定模擬行為：預期 DeleteUserJwt 被呼叫並回傳 nil
+	mockRepo.On("DeleteUserJwt", mock.Anything, jwt).Return(nil)
+
+	// 執行登出
+	err := authService.Logout(context.Background(), jwt)
+
+	// 斷言
+	assert.NoError(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestLogout_FailedLogout(t *testing.T) {
+	// 準備測試數據
+	mockRepo := new(MockAuthRepository)
+	authService := NewAuthService(mockRepo)
+
+	jwt := "some-invalid-jwt-token"
+	expectedErr := errors.New("failed to delete jwt")
+
+	// 設定模擬行為：預期 DeleteUserJwt 被呼叫並回傳錯誤
+	mockRepo.On("DeleteUserJwt", mock.Anything, jwt).Return(expectedErr)
+
+	// 執行登出
+	err := authService.Logout(context.Background(), jwt)
+
+	// 斷言
+	assert.Error(t, err)
+	assert.Equal(t, expectedErr, err)
+	mockRepo.AssertExpectations(t)
+}

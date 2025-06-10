@@ -51,3 +51,11 @@
 - [x] 檢查 token 是否過期
 - [x] 檢查 token 是否與數據庫一致
 ### 3.2 錯誤攔截與統一處理
+- todo
+
+## 4. todo
+### 4.1 cicd
+- test stage 
+- build stage
+### 4.2 unit test
+- todo
