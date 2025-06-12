@@ -24,23 +24,6 @@ func NewAuthService(authRepo domain.AuthRepository) *AuthService {
 	}
 }
 
-// GetUser 獲取用戶信息
-func (s *AuthService) GetUser(ctx context.Context, id string) (*domain.User, error) {
-	// 驗證用戶ID
-	id = strings.TrimSpace(id)
-	if id == "" {
-		return nil, domain.ErrInvalidUserID
-	}
-
-	// 調用倉儲層獲取用戶
-	user, err := s.authRepo.GetByUsername(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
 // Login 處理使用者登入邏輯
 func (s *AuthService) Login(username, password string) (string, error) {
 	// 查詢使用者
@@ -90,6 +73,23 @@ func (s *AuthService) Login(username, password string) (string, error) {
 // Logout 處理使用者登出邏輯
 func (s *AuthService) Logout(ctx context.Context, jwt string) error {
 	return s.authRepo.DeleteUserJwt(ctx, jwt)
+}
+
+// GetUser 獲取用戶信息
+func (s *AuthService) GetUser(ctx context.Context, username string) (*domain.User, error) {
+	// 驗證用戶名稱
+	username = strings.TrimSpace(username)
+	if username == "" {
+		return nil, domain.ErrInvalidUserID
+	}
+
+	// 調用倉儲層獲取用戶
+	user, err := s.authRepo.GetByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 // CheckPermission 檢查用戶是否有權限訪問特定資源

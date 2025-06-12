@@ -171,3 +171,63 @@ func TestLogout_FailedLogout(t *testing.T) {
 	assert.Equal(t, expectedErr, err)
 	mockRepo.AssertExpectations(t)
 }
+
+func TestGetUser_SuccessfulRetrieval(t *testing.T) {
+	// 準備測試數據
+	mockRepo := new(MockAuthRepository)
+	authService := NewAuthService(mockRepo)
+
+	userID := "testuser123"
+	expectedUser := &domain.User{
+		Username: userID,
+		Roles:    []string{"user"},
+	}
+
+	// 設定模擬行為
+	mockRepo.On("GetByUsername", mock.Anything, userID).Return(expectedUser, nil)
+
+	// 執行獲取用戶
+	user, err := authService.GetUser(context.Background(), userID)
+
+	// 斷言
+	assert.NoError(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, expectedUser, user)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetUser_EmptyUserID(t *testing.T) {
+	// 準備測試數據
+	mockRepo := new(MockAuthRepository)
+	authService := NewAuthService(mockRepo)
+
+	// 執行獲取用戶
+	user, err := authService.GetUser(context.Background(), "")
+
+	// 斷言
+	assert.Error(t, err)
+	assert.Nil(t, user)
+	assert.Equal(t, domain.ErrInvalidUserID, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func TestGetUser_UserNotFound(t *testing.T) {
+	// 準備測試數據
+	mockRepo := new(MockAuthRepository)
+	authService := NewAuthService(mockRepo)
+
+	userID := "nonexistentuser"
+	expectedError := errors.New("user not found")
+
+	// 設定模擬行為
+	mockRepo.On("GetByUsername", mock.Anything, userID).Return(nil, expectedError)
+
+	// 執行獲取用戶
+	user, err := authService.GetUser(context.Background(), userID)
+
+	// 斷言
+	assert.Error(t, err)
+	assert.Nil(t, user)
+	assert.Equal(t, expectedError, err)
+	mockRepo.AssertExpectations(t)
+}
