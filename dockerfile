@@ -42,9 +42,5 @@ ENV TZ=Asia/Taipei
 # 暴露服務端口
 EXPOSE 5002
 
-# 設置健康檢查
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:5002/health || exit 1
-
 # 運行應用程序
 CMD ["./rbac-service"]
